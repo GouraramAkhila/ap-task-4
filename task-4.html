@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Portfolio Project</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+    }
+
+    header, footer {
+      background-color: #333;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    nav {
+      background: #444;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      padding: 10px 20px;
+      color: white;
+      text-decoration: none;
+    }
+
+    section {
+      padding: 30px;
+    }
+
+    h2 {
+      color: #222;
+    }
+
+    /* Responsive Layout */
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* To-Do */
+    #todoApp {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    input, button, select {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    ul {
+      padding: 0;
+      list-style: none;
+    }
+
+    ul li {
+      background: #eee;
+      margin: 8px 0;
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    ul li button {
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Product Filter */
+    .product {
+      background: white;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .product span {
+      display: block;
+      font-size: 14px;
+      color: #555;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>My Personal Portfolio</h1>
+  </header>
+
+  <nav>
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <!-- ABOUT SECTION -->
+  <section id="about">
+    <h2>About Me</h2>
+    <p>Hello! I'm a passionate web developer learning HTML, CSS, and JavaScript. This project showcases my skills through interactive sections like a to-do list, product filter, and a responsive layout.</p>
+  </section>
+
+  <!-- PROJECTS SECTION -->
+  <section id="projects">
+    <h2>Projects</h2>
+    <div class="grid">
+
+      <!-- TO-DO APP -->
+      <div id="todoApp">
+        <h3>To-Do List (with localStorage)</h3>
+        <input type="text" id="taskInput" placeholder="Enter a task" />
+        <button onclick="addTask()">Add Task</button>
+        <ul id="taskList"></ul>
+      </div>
+
+      <!-- PRODUCT FILTER APP -->
+      <div>
+        <h3>Product Filter & Sort</h3>
+        <select id="categoryFilter" onchange="filterProducts()">
+          <option value="all">All Categories</option>
+          <option value="tech">Tech</option>
+          <option value="books">Books</option>
+        </select>
+        <select id="sortBy" onchange="sortProducts()">
+          <option value="rating">Sort by Rating</option>
+          <option value="price">Sort by Price</option>
+        </select>
+        <div id="productList"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT SECTION -->
+  <section id="contact">
+    <h2>Contact</h2>
+    <form onsubmit="alert('Message sent!'); return false;">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea placeholder="Your Message" rows="4" required></textarea>
+      <button type="submit">Send</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 My Portfolio</p>
+  </footer>
+
+  <script>
+    // ---------- TO-DO APP WITH localStorage ----------
+    function loadTasks() {
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+      tasks.forEach((task, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = ${task} <button onclick="removeTask(${i})">Delete</button>;
+        list.appendChild(li);
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const task = input.value.trim();
+      if (!task) return;
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks.push(task);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      input.value = "";
+      loadTasks();
+    }
+
+    function removeTask(index) {
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks.splice(index, 1);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      loadTasks();
+    }
+
+    // ---------- PRODUCT FILTERING & SORTING ----------
+    const products = [
+      { name: "Laptop", category: "tech", rating: 4.5, price: 800 },
+      { name: "Book: JavaScript", category: "books", rating: 4.8, price: 25 },
+      { name: "Headphones", category: "tech", rating: 4.2, price: 150 },
+      { name: "Notebook", category: "books", rating: 4.0, price: 10 }
+    ];
+
+    function renderProducts(filteredProducts) {
+      const container = document.getElementById("productList");
+      container.innerHTML = "";
+      filteredProducts.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `<strong>${p.name}</strong>
+                         <span>Category: ${p.category}</span>
+                         <span>Rating: ${p.rating}</span>
+                         <span>Price: $${p.price}</span>`;
+        container.appendChild(div);
+      });
+    }
+
+    function filterProducts() {
+      const category = document.getElementById("categoryFilter").value;
+      let filtered = category === "all" ? products : products.filter(p => p.category === category);
+      const sort = document.getElementById("sortBy").value;
+      filtered = sortProductsArray(filtered, sort);
+      renderProducts(filtered);
+    }
+
+    function sortProducts() {
+      const sort = document.getElementById("sortBy").value;
+      const category = document.getElementById("categoryFilter").value;
+      let filtered = category === "all" ? products : products.filter(p => p.category === category);
+      renderProducts(sortProductsArray(filtered, sort));
+    }
+
+    function sortProductsArray(arr, sortKey) {
+      return arr.slice().sort((a, b) => {
+        return sortKey === "rating" ? b.rating - a.rating : a.price - b.price;
+      });
+    }
+
+    // ---------- INIT ----------
+    loadTasks();
+    renderProducts(products);
+  </script>
+
+</body>
+</html>
